@@ -51,7 +51,12 @@ Run skill maps-lead-search with limit=10. Show the results summary. If auto_revi
 Ask: "How does this look? Anything to adjust — different columns, stricter filters, different format?"
 Write corrections back to SEARCH_CRITERIA.md or OFFER_CONTEXT.md.
 
-## Step 9. Finish
+## Step 9. Offer weekly automation
+After the test run, offer: "Want me to search automatically every week? I can set up a Monday night scan with your default criteria — new leads will be in your table by morning."
+- If yes: read AUTOMATIONS.md for the exact cron schedule and task prompt. Create the cron task using those texts verbatim. Confirm: "Weekly scan set: Mondays 03:00, results by 08:00."
+- If no: skip. The user can request it later: "Set up weekly scan."
+
+## Step 10. Finish
 Write to memory: `onboarding_complete=true`; save all collected parameters to USER.md.
 Say: "Setup complete. From here:
 1) 'Find me [N] [type] in [location]' — run a new search

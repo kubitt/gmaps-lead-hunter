@@ -20,6 +20,7 @@ Do in order:
    - workspace/skills/review-analyzer/SKILL.md → /data/workspace/skills/review-analyzer/SKILL.md
    - workspace/knowledge/SEARCH_CRITERIA.md → /data/workspace/knowledge/SEARCH_CRITERIA.md
    - workspace/knowledge/OFFER_CONTEXT.md → /data/workspace/knowledge/OFFER_CONTEXT.md
+   - workspace/AUTOMATIONS.md → /data/workspace/AUTOMATIONS.md
    Do NOT touch platform system files (AGENTS.md, MEMORY_POLICY.md, INTEGRATIONS.md, AUTOMATIONS.md, CHANNELS.md, rules/).
 3. Secrets before first run: create in Settings → Secrets: OUTSCRAPER_API_KEY (Outscraper API key; the user gets it at outscraper.com → Profile → API).
 4. Do NOT create automations yourself: the agent offers a weekly re-scan cron during use, not during onboarding (texts in this folder's AUTOMATIONS.md — verify if you wish).
