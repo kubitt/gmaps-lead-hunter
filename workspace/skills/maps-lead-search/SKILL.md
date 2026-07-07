@@ -1,69 +1,44 @@
 ---
 name: maps-lead-search
-description: Search Google Maps for businesses and collect contacts. Use when the user says "find me", "search for", "collect leads", gives a niche + location, or asks to refine/expand a previous search.
+description: Search Google Maps for businesses and collect contacts. Use when the user says "find me", "search for", "collect leads", or gives a niche + location.
 ---
 
 # Maps lead search
 
-Goal: deliver a filtered, deduplicated list of businesses from Google Maps with full contact details, written to the user's table — fast and with zero invented data.
+Find businesses on Google Maps matching the user's criteria and save them to the table.
 
-## Algorithm
-1. Parse the user's request into structured criteria:
-   - `query`: business type/niche (e.g., "beauty salons", "dental clinics", "restaurants")
-   - `location`: city, region, or country (e.g., "London, UK")
-   - `max_results`: target count (default 100, max 500)
-   - `rating_filter`: e.g., "below 4.0", "above 3.5", "any" (default: any)
-   - `must_have_phone`: true/false (default: false)
-   - `must_have_website`: true/false (default: false)
-   - Priority cities if the location is a country (user may specify "start with London, then Manchester, Birmingham").
+## How it works
+1. Parse what the user wants: business type, location, how many (default 100, max 500), rating filter, phone/website requirements.
 
-2. If the location is broad (country-level), break it into city-level searches. Start with priority cities, then expand. Report progress: "Searching London... 45 found. Moving to Manchester..."
+2. If the location is a whole country — split into cities. Start with priority cities from SEARCH_CRITERIA.md. Report progress as you go.
 
-3. Call Outscraper Google Maps Search API:
+3. Call Outscraper API:
    - Endpoint: `GET https://api.outscraper.com/google-maps-search`
-   - Parameters: `query` = "[niche], [city]", `limit` = min(500, remaining_needed), `language` = "en"
-   - Auth: API key from Settings → Secrets as `OUTSCRAPER_API_KEY`
+   - Key params: `query` = "[type], [city]", `limit` = how many needed
+   - Auth: OUTSCRAPER_API_KEY from Secrets
 
-4. For each result, extract and normalize:
-   - business_name (from `name`)
-   - category (from `category`)
-   - address (from `full_address`)
-   - city (from `city`)
-   - phone (from `phone` — keep original format with country code)
-   - website (from `site`)
-   - google_maps_link (construct from `place_id`: `https://www.google.com/maps/place/?q=place_id:{place_id}`)
-   - rating (from `rating`)
-   - review_count (from `reviews`)
-   - description (from `description` or `subtypes` joined)
+4. From each result, take: business_name, category, address, city, phone, website, google_maps_link (from place_id), rating, review_count, description.
 
-5. Filter:
-   - Apply rating_filter (e.g., keep only rating < 4.0)
-   - Apply must_have_phone / must_have_website if set
-   - Deduplicate against existing rows in "Google Maps Leads" table by business_name + city + phone
-   - Remove results with business_status != OPERATIONAL
+5. Filter: apply rating threshold, phone/website requirements, remove duplicates against existing table rows, skip closed businesses.
 
-6. Write to the user's chosen destination (Google Sheets or Notion — stored in memory as `output_destination`):
-   - Table: "Google Maps Leads"
-   - Columns: business_name, category, address, city, phone, website, google_maps_link, rating, review_count, description, review_insights (empty — filled by review-analyzer), suggested_offer (empty), status (= "new")
-   - Append rows; never overwrite existing data.
+6. Write new rows to "Google Maps Leads" table (Sheets or Notion — whatever the user connected). Columns: business_name, category, address, city, phone, website, google_maps_link, rating, review_count, description, review_insights (empty), suggested_offer (empty), status = "new".
 
-7. Send summary to the notification channel: total API results, total after filtering, total new (excluding duplicates), link to the table. If fewer than requested — explain why.
+7. Send summary: how many found, how many passed filters, how many new, link to table.
 
-## Output
+## Example output
 ```
-Search complete: "beauty salons" in London, UK
-- API returned: 127 businesses
+Search done: "beauty salons" in London, UK
+- Found: 127
 - After filters (rating < 4.0, has phone): 83
-- New (not already in table): 79
-- Written to: [Google Sheets link]
+- New (not in table yet): 79
+- Saved to: [table link]
 
-Top categories: Hair Salon (34), Nail Salon (22), Beauty Salon (18), Spa (5)
-Rating range: 2.1 – 3.9 | Average: 3.4
+Top categories: Hair Salon (34), Nail Salon (22), Beauty Salon (18)
+Average rating: 3.4
 ```
 
 ## Edge cases
-- Location too broad + high count (e.g., "restaurants in UK, 500") → break into top-10 cities by population, search each, merge results. Warn: "UK-wide search will use ~10 API calls across cities. Proceeding."
-- Fewer results than requested → report honestly: "Only 43 beauty salons with rating < 3.0 exist in Leeds. Consider raising the rating threshold or expanding to nearby cities."
-- Outscraper API error or rate limit → retry once after 30 seconds; if still failing, report the error and partial results. Never silently drop a failed city.
-- Duplicate search (same niche + city as a previous run) → warn: "You searched this before on [date]. [N] leads already in the table. Search again for new listings? Or try a different area?"
-- Phone/website missing for some results → include them with empty fields; note in the summary: "23 of 79 leads have no phone listed on Google Maps."
+- Too few results: say honestly "Only 43 found in Leeds. Try raising the rating limit or adding nearby cities."
+- API error: retry once, then report what happened and save partial results.
+- Same search twice: warn "You searched this on [date]. [N] leads already there. Search again for new ones?"
+- Missing phone/website: include the lead, leave field empty, note in summary "23 of 79 have no phone on Google Maps."

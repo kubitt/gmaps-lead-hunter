@@ -1,29 +1,29 @@
-# Search Criteria Defaults
-[FILLED DURING ONBOARDING — the agent maintains this file as it learns from user searches]
+# Search Criteria
+[Filled during setup — you can edit these anytime]
 
-## Default search parameters
-| Parameter | Value |
+## Your defaults
+| Setting | Value |
 |---|---|
-| Primary niche | [FILL DURING ONBOARDING, e.g., "beauty salons"] |
-| Primary geography | [FILL DURING ONBOARDING, e.g., "UK"] |
-| Priority cities | [FILL DURING ONBOARDING, e.g., "London, Manchester, Birmingham"] |
-| Default result count | [FILL DURING ONBOARDING, default: 100] |
-| Rating filter | [FILL DURING ONBOARDING, e.g., "below 4.0" or "any"] |
-| Must have phone | [FILL DURING ONBOARDING, default: false] |
-| Must have website | [FILL DURING ONBOARDING, default: false] |
-| Auto-review analysis | [FILL DURING ONBOARDING, default: false] |
+| Business type | [e.g. beauty salons] |
+| Country / region | [e.g. United Kingdom] |
+| Priority cities | [e.g. London, Manchester, Birmingham] |
+| How many per search | [default: 100] |
+| Rating filter | [e.g. below 4.0, or "any"] |
+| Must have phone | [yes / no, default: no] |
+| Must have website | [yes / no, default: no] |
+| Auto-analyze reviews | [yes / on demand / no] |
 
-## Example filled
-| Parameter | Value |
+## Example
+| Setting | Value |
 |---|---|
-| Primary niche | beauty salons |
-| Primary geography | United Kingdom |
+| Business type | beauty salons |
+| Country / region | United Kingdom |
 | Priority cities | London, Manchester, Birmingham, Leeds, Glasgow |
-| Default result count | 100 |
+| How many per search | 100 |
 | Rating filter | below 4.0 |
-| Must have phone | true |
-| Must have website | false |
-| Auto-review analysis | true |
+| Must have phone | yes |
+| Must have website | no |
+| Auto-analyze reviews | yes |
 
 ## Search history
-[Agent appends after each search: date, criteria, results count, link]
+[I add a line here after each search: date, what was searched, how many found]
